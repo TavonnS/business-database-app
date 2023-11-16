@@ -22,4 +22,4 @@ VALUES  (1, 'Johnny', 'Carson', 1, null),
         (5, 'Karry', 'Sings', 5, null),
         (6, 'Mal', 'Orange', 6, 5),
         (7, 'Sareph', 'Lordey', 7, null),
-        (8, 'Thom', 'Alien', 8, 7),;
+        (8, 'Thom', 'Alien', 8, 7);
