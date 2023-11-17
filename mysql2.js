@@ -13,4 +13,22 @@ const connection = mysql2.createConnection({
   password: password
 });
 
+// an example query
+/*
+const sql = 'SHOW TABLES;';
+
+connection.query(sql, (err, results, fields) => {
+  if (err) {
+    console.error('Error executing SELECT query:', err);
+    return;
+  }
+  console.log('Results:', results);
+});
+// 
+*/
+connection.end();
+
+
+
+
 

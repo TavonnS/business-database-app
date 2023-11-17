@@ -23,9 +23,10 @@ const appPrompt = [
         message: 'Enter the salary of the new role...'
     },
     {
-        type: 'input',
+        type: 'list',
         name: 'addRoleDepartment',
-        message: 'Enter the department for the new role...'
+        message: 'Choose the department for the new role...',
+        choices: ['department list']
     },
     {
         type: 'input',
@@ -38,9 +39,10 @@ const appPrompt = [
         message: 'What is the new employee\'s last name?'
     },
     {
-        type: 'input',
+        type: 'list',
         name: 'addEmployeerole',
-        message: 'What is the role of the new employee?'
+        message: 'What is the role of the new employee?',
+        choices: ['role list']
     },
     {
         type: 'input',
@@ -51,14 +53,14 @@ const appPrompt = [
         type: 'list',
         name: 'selectEmployeeToUpdate',
         message: 'Which employee do you want to update?',
-        choices: [],
+        choices: ['employee list'],
 
     },
     {
         type: 'list',
         name: 'selectUpdatedEmployeeRole',
         message: 'What is the employee\'s new role?',
-        choices: [],
+        choices: ['role list'],
     },
 ];
 
