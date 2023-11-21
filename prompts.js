@@ -1,17 +1,21 @@
-const inquirer = require('inquirer');
+// const inquirer = require('inquirer');
 
-const appPrompt = [
+const firstPrompt = [
     {
         type: 'list',
         name: 'options',
         message: 'Select an option...',
         choices: ['View all departments', 'View all roles', 'View all employees', 'Add a department', 'Add a role', 'Add an employee', 'Update an employee role', 'Quit'],
-    },
+    }];
+
+const departmentPrompt = [
     {
         type: 'input',
         name: 'addDepartment',
         message: 'Enter the name of the new department...',
-    },
+    }];
+
+const rolePrompt = [
     {
         type: 'input',
         name: 'addRoleName',
@@ -27,7 +31,9 @@ const appPrompt = [
         name: 'addRoleDepartment',
         message: 'Choose the department for the new role...',
         choices: ['department list']
-    },
+    }];
+
+const employeePrompt = [    
     {
         type: 'input',
         name: 'addEmployeeFname',
@@ -48,7 +54,9 @@ const appPrompt = [
         type: 'input',
         name: 'addEmployeeManager',
         message: 'Who is the new employee\'s manager?'
-    },
+    }];
+
+const updatePrompt = [
     {
         type: 'list',
         name: 'selectEmployeeToUpdate',
@@ -64,4 +72,4 @@ const appPrompt = [
     },
 ];
 
-module.exports = appPrompt;
+module.exports = firstPrompt, departmentPrompt, rolePrompt, employeePrompt, updatePrompt;
