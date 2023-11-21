@@ -45,15 +45,13 @@ function init() {
             // action prompts:
             
             else if (answers.options === "Add a department") {
-                    addDept();
+                addDept();
             } else if (answers.options === "Add a role") {
-                inquirer.prompt(
-                rolePrompt).then();
+                addRole();
             } else if (answers.options === "Add an employee") {
-                inquirer.prompt(
-                employeePrompt)
+                addEmployee();
             } else if (answers.options === "Update an employee role") {
-                inquirer.prompt(updatePrompt);
+                updateEmployee();
             } else 
                 connection.end();
         });
@@ -66,5 +64,14 @@ function addDept(){
     });
 };
 
+function addRole(){
+    inquirer.prompt(rolePrompt)
+};
+function addEmployee(){
+    inquirer.prompt(employeePrompt)
+};
+function updateEmployee(){
+    inquirer.prompt(updatePrompt)
+};
 
 init();
