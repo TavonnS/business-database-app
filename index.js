@@ -71,26 +71,15 @@ function addDept() {
 // add role:
 function addRole(){
     inquirer.prompt(rolePrompt).then((answers) => {
-        const sqlName = `INSERT INTO role (name) VALUES (?);`
-        const paramsN = answers.addRoleName;
 
-        connection.query(sqlName, paramsN, (err, result) => {
-            if (err){console.error(err)}
-            console.log(result)
-        });
+        
 
-        const sqlSalary = `INSERT INTO role (salary) VALUES (?);`    
-        const paramsSal = answers.addRoleSalary;
-            
-        connection.query(sqlSalary, paramsSal, (err, result) => {
-            if (err){console.error(err)}
-            console.log(result)
-        });
+        const sql = `INSERT INTO role (title, salary, department_id) VALUES ?;`
+        const params = [
+            [answers.addRoleName, answers.addRoleSalary, answers.addRoleDepartment]
+        ];
 
-        const sqlDept = `INSERT INTO role (department_id) VALUES (?);`
-        const paramsDept = answers.addRoleDepartment;
-
-        connection.query(sqlDept, paramsDept, (err, result) => {
+        connection.query(sql, params, (err, result) => {
             if (err){console.error(err)}
             console.log(result)
         });
@@ -98,6 +87,7 @@ function addRole(){
     })
 };
 
+// add employee:
 function addEmployee() {
     inquirer.prompt(employeePrompt)    
     .then((answers) => 
@@ -144,6 +134,8 @@ function addEmployee() {
 
 
 };
+
+// update employee:
 function updateEmployee() {
     inquirer.prompt(updatePrompt)
     .then((answers) => 
@@ -156,7 +148,7 @@ function updateEmployee() {
 };
 
 
-// the main function:
+// the MAIN function:
 function init() {
     inquirer
         .prompt(firstPrompt).then((answers) => {
