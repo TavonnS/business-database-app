@@ -130,5 +130,5 @@ dist
 .pnp.*
 
 # also
-encrypt.js
+
 .gitignore
