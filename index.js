@@ -71,10 +71,14 @@ function addDept() {
 // add role:
 function addRole(){
     inquirer.prompt(rolePrompt).then((answers) => {
-
+        connection.query('SELECT title FROM role;', (err, result) => 
+        {
+            if (err) {console.error(err)}
+            console.log(result)
+        });
         
 
-        const sql = `INSERT INTO role (title, salary, department_id) VALUES ?;`
+        const sql = `INSERT INTO role (title, salary, department_id) VALUES (?);`
         const params = [
             [answers.addRoleName, answers.addRoleSalary, answers.addRoleDepartment]
         ];

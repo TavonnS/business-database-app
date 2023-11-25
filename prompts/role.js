@@ -1,4 +1,13 @@
 const mysql2 = require('mysql2');
+const connection = require('../mysql2');
+
+
+// retrive departments from role table in database:
+const deptList = connection.query('SELECT title FROM role;', (err, result) => 
+        {
+            if (err) {console.error(err)}
+            return result;
+        });
 
 const rolePrompt = [
     {
@@ -15,7 +24,7 @@ const rolePrompt = [
         type: 'list',
         name: 'addRoleDepartment',
         message: 'Choose the department for the new role...',
-        choices: ['Sales', 'Legal', 'Finance', 'Engineering']
+        choices: []
     }];
 
 module.exports = rolePrompt;
