@@ -58,10 +58,27 @@ function addDept() {
     (answers) => {
     const sql = `INSERT INTO department (name) VALUES (?);`
     const params = answers.addDepartment;
+
     connection.query(sql, params, (err, result) => {
     if (err) {return console.error(err)}
-    else console.log(result) } ); // mysql function ends
-    } ) // inquirer function ends
+    else {
+      console.log('successfully created new department!', params);
+      console.log('\n')
+
+    }} 
+    
+    )
+    
+    ; // mysql function ends
+    } )
+    .then(() => {
+        init();
+        console.log('\n')
+    }
+        
+        
+    )
+    // inquirer function ends
 }; // add department function ends
 
 
@@ -70,7 +87,31 @@ function addDept() {
 
 // add role:
 function addRole(){
-    inquirer.prompt(rolePrompt).then((answers) => {
+    
+    connection.query('SELECT name FROM department;', (err, result) => 
+        {
+            if (err) {console.error(err)};
+
+            const deptNames = result.map(item => item.name)
+
+    inquirer.prompt([
+        {
+            type: 'input',
+            name: 'addRoleName',
+            message: 'Enter the name of the new role...'
+        },
+        {
+            type: 'input',
+            name: 'addRoleSalary',
+            message: 'Enter the salary of the new role...'
+        },
+        {
+            type: 'list',
+            name: 'addRoleDepartment',
+            message: 'Choose the department for the new role...',
+            choices: [...deptNames]
+        }]
+        ).then((answers) => {
         connection.query('SELECT title FROM role;', (err, result) => 
         {
             if (err) {console.error(err)}
@@ -87,9 +128,11 @@ function addRole(){
             if (err){console.error(err)}
             console.log(result)
         });
-    
+        
     })
-};
+})
+
+}
 
 // add employee:
 function addEmployee() {
