@@ -1,20 +1,6 @@
 const mysql2 = require('mysql2');
 const connection = require('../mysql2');
 
-const role = connection.query('SELECT * FROM role;', (err, results) => {
-    if (err) {
-        console.error(err);
-        return;
-    }
-    return results;
-});
-
-const manager = connection.query('SELECT * FROM employee;', (err, results) => {
-    if (err){console.error(err);
-        return;
-    }
-    return results;
-});
 
 const employeePrompt = [
     {
@@ -31,7 +17,7 @@ const employeePrompt = [
         type: 'list',
         name: 'addEmployeeRole',
         message: 'What is the role of the new employee?',
-        choices: []
+        choices: ['Role, Role2']
     },
     {
         type: 'list',
@@ -45,4 +31,3 @@ module.exports = employeePrompt;
 
 // last two prompts need sql data
 
-// ['Sales Lead', 'Salesperson', 'Lead Engineer', 'Software Engineer', 'Account Manager', 'Accountant', 'Legal Team Lead', 'Lawyer']
