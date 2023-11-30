@@ -15,13 +15,14 @@ const connection = require('./mysql2');
 
 // the sql functions here:
 
-// view departments:
+// view departments: DONE.
 function deptView(){
     connection.query('SELECT * FROM department;', (err, results) => {
         if (err) {
             console.error('Error retrieving departments:', err);
         } else {
             console.table(results)
+
             init();
         }});
         
@@ -74,11 +75,42 @@ function addDept() {
         });
 };
 
+// remove department: WORKING.
+function rmDept() {
+    connection.query('SELECT * FROM department;', (err, result) => 
+    {
+        if (err) {console.error(err)}
+
+        const deptNames = result.map(({id, name}) => ({name: name, value: id}))
+
+    
+    inquirer.prompt([
+        {
+        type: 'list',
+        name: 'select', 
+        choices: deptNames,
+        message: 'Select which department to remove...'
+    }
+    ])
+    .then((answers) => {
+        const sql = `DELETE FROM department WHERE id = (?);`
+        return connection.promise().query(sql, [answers.select]);
+        })
+
+        .then((result) => {
+            console.log('Success!');
+            init();
+        })
+        .catch((err) => {
+            console.error(err);
+        })
+    })};
 
 
 
 
-// add role:
+
+// add role:  still not complete!
 function addRole(){
 
     connection.query('SELECT name FROM department;', (err, result) => 
@@ -107,7 +139,7 @@ function addRole(){
 
         .then((answers) => {
         const params = [answers.addRoleName, answers.addRoleSalary, answers.addRoleDepartment];
-        const sql = `INSERT INTO role (title) VALUES (?);`
+        const sql = `INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?);`
         return connection.promise().query(sql, params);
         })
 
@@ -122,10 +154,10 @@ function addRole(){
     }) 
 };
 
-// remove role:
+// remove role: done.
 function rmRole() {
     
-    connection.query('SELECT title FROM role;', (err, result) => 
+    connection.query('SELECT * FROM role;', (err, result) => 
         {
             if (err) {console.error(err)}
 
@@ -143,7 +175,7 @@ function rmRole() {
         ]
     )
     .then((answers) => {
-        const sql = `DELETE FROM role WHERE title = (?);`
+        const sql = `DELETE FROM role WHERE id = (?);`
         return connection.promise().query(sql, [answers.select]);
         })
 
@@ -178,6 +210,37 @@ function addEmployee() {
     });
     
 };
+
+// remove employee: working but only displays last name.
+function rmEmployee() {
+    connection.query('SELECT * FROM employee;', (err, result) => {
+        if (err) {console.error(err)}
+
+        const employees = result.map(({id, last_name}) => ({name: last_name, value: id}))    
+        
+        inquirer.prompt([
+            {
+                type: 'list',
+                name: 'select',
+                choices: employees,
+                message: 'Select which employee to remove...'
+            }
+        ])
+        .then((answers) => {
+
+            const sql = `DELETE FROM employee WHERE id = (?);`
+            return connection.promise().query(sql, [answers.select])
+            
+            .then((result) => {
+                console.log('Success!');
+                init();
+            })
+            .catch((err) => {
+                console.error(err);
+            });
+        });
+    });
+    };
 
 // update employee:
 function updateEmployee() {
@@ -226,7 +289,11 @@ function init() {
                 
             else if (answers.options === "Update an employee role") {updateEmployee()} 
 
-            else if (answers.options === "Delete a role") {rmRole()}
+            else if (answers.options === "Remove a role") {rmRole()}
+
+            else if (answers.options === "Remove a department") {rmDept()}
+
+            else if (answers.options === "Remove an employee") {rmEmployee()}
                 
             else 
                 connection.end()
