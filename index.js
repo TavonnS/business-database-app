@@ -30,7 +30,7 @@ function deptView(){
 
 // view roles:
 function roleView(){
-    connection.query('SELECT * FROM role;', (err, results) => {
+    connection.query('SELECT role.title, role.salary, department.name FROM role LEFT JOIN department on role.department_id = department.id;', (err, results) => {
         if (err) {
             console.error('Error finding roles', err);
         } else {
@@ -43,7 +43,8 @@ function roleView(){
 
 // view employees:
 function employeeView(){
-    connection.query('SELECT * FROM employee;', (err, results) => {
+    connection.query('SELECT employee.id, employee.first_name, employee.last_name, role.title, employee.manager_id FROM employee LEFT JOIN role ON employee.role_id = role.id;', 
+    (err, results) => {
         if (err) {
             console.error('Error finding employees', err);
         } else {
