@@ -1,3 +1,4 @@
+// dependancies:
 const inquirer = require('inquirer');
 const mysql2 = require('mysql2');
 
@@ -12,10 +13,7 @@ const updatePrompt = require('./prompts/update');
 const connection = require('./mysql2');
 
 
-
-// the sql functions here:
-
-// view departments: DONE.
+// view departments: 
 function deptView(){
     connection.query('SELECT * FROM department;', (err, results) => {
         if (err) {
@@ -30,7 +28,10 @@ function deptView(){
 
 // view roles:
 function roleView(){
-    connection.query('SELECT role.title, role.salary, department.name FROM role LEFT JOIN department on role.department_id = department.id;', (err, results) => {
+    connection.query(`SELECT role.id, role.title, role.salary, d.name AS department FROM role LEFT JOIN department d ON role.department_id = d.name
+    LEFT JOIN department ON role.department_id = department.name;`,
+ 
+    (err, results) => {
         if (err) {
             console.error('Error finding roles', err);
         } else {
@@ -43,7 +44,17 @@ function roleView(){
 
 // view employees:
 function employeeView(){
-    connection.query('SELECT employee.id, employee.first_name, employee.last_name, role.title, employee.manager_id FROM employee LEFT JOIN role ON employee.role_id = role.id;', 
+    connection.query(`SELECT
+    e.id AS employee_id,
+    e.first_name,
+    e.last_name,
+    r.title AS role_title,
+    m.last_name AS manager_last_name
+FROM 
+    employee e
+    LEFT JOIN role r ON e.role_id = r.id
+    LEFT JOIN employee m ON e.manager_id = m.id;`,
+
     (err, results) => {
         if (err) {
             console.error('Error finding employees', err);
