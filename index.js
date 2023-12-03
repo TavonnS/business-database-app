@@ -96,24 +96,25 @@ function addDept() {
         });
 };
 
-// remove department: WORKING.
+// remove department: .
 function rmDept() {
     connection.query('SELECT * FROM department;', (err, result) => 
     {
         if (err) {console.error(err)}
 
-        const deptNames = result.map(({id, name}) => ({name: name, value: id}))
-
+        const deptIds = result.map(({id, name}) => ({name: name, value: id}))
+        
     
     inquirer.prompt([
         {
         type: 'list',
         name: 'select', 
-        choices: deptNames,
+        choices: deptIds,
         message: 'Select which department to remove...'
     }
     ])
     .then((answers) => {
+        console.log(answers.select);
         const sql = `DELETE FROM department WHERE id = (?);`
         return connection.promise().query(sql, [answers.select]);
         })
@@ -131,10 +132,10 @@ function rmDept() {
 
 
 
-// add role:  still not complete!
+// add role:  done.
 function addRole(){
 
-    connection.query('SELECT name FROM department;', (err, result) => 
+    connection.query('SELECT * FROM department;', (err, result) => 
         {
             if (err) {console.error(err)}
 
@@ -159,9 +160,6 @@ function addRole(){
         }])
 
         .then((answers) => {
-        // const params = [answers.addRoleName, answers.addRoleSalary, answers.addRoleDepartment];
-        const deptArr = [answers.addRoleDepartment];
-        
 
         const sql = `INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?);`
         return connection.promise().query(sql, [answers.addRoleName, answers.addRoleSalary, answers.addRoleDepartment]);
