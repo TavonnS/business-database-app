@@ -13,7 +13,7 @@ const updatePrompt = require('./prompts/update');
 const connection = require('./mysql2');
 
 
-// view departments: 
+// view departments: DONE.
 function deptView(){
     connection.query('SELECT * FROM department;', (err, results) => {
         if (err) {
@@ -26,10 +26,16 @@ function deptView(){
         
     };
 
-// view roles:
+// view roles: DONE.
 function roleView(){
-    connection.query(`SELECT role.id, role.title, role.salary, d.name AS department FROM role LEFT JOIN department d ON role.department_id = d.name
-    LEFT JOIN department ON role.department_id = department.name;`,
+    connection.query(`SELECT 
+    role.id,
+    role.title,
+    role.salary,
+    department.name AS department_name
+FROM 
+    role
+    LEFT JOIN department ON role.department_id = department.id;`,
  
     (err, results) => {
         if (err) {
@@ -42,18 +48,21 @@ function roleView(){
     
 };
 
-// view employees:
+// view employees: DONE.
 function employeeView(){
     connection.query(`SELECT
     e.id AS employee_id,
     e.first_name,
     e.last_name,
     r.title AS role_title,
+    department.name AS department_name,
+    r.salary,
     m.last_name AS manager_last_name
 FROM 
     employee e
     LEFT JOIN role r ON e.role_id = r.id
-    LEFT JOIN employee m ON e.manager_id = m.id;`,
+    LEFT JOIN employee m ON e.manager_id = m.id
+    LEFT JOIN department ON r.department_id = department.id;`,
 
     (err, results) => {
         if (err) {
@@ -67,7 +76,7 @@ FROM
 
 
 
-// add department:
+// add department: DONE.
 function addDept() {
     inquirer.prompt([{
             type: 'input',
@@ -150,9 +159,12 @@ function addRole(){
         }])
 
         .then((answers) => {
-        const params = [answers.addRoleName, answers.addRoleSalary, answers.addRoleDepartment];
+        // const params = [answers.addRoleName, answers.addRoleSalary, answers.addRoleDepartment];
+        const deptArr = [answers.addRoleDepartment];
+        
+
         const sql = `INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?);`
-        return connection.promise().query(sql, params);
+        return connection.promise().query(sql, [answers.addRoleName, answers.addRoleSalary, answers.addRoleDepartment]);
         })
 
         .then((result) => {
