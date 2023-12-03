@@ -96,7 +96,7 @@ function addDept() {
         });
 };
 
-// remove department: .
+// remove department: DONE.
 function rmDept() {
     connection.query('SELECT * FROM department;', (err, result) => 
     {
@@ -210,30 +210,78 @@ function rmRole() {
         });
         })
     };
+
+
+
     
-// add employee:
+    
+// add employee: DONE.
 function addEmployee() {
-    inquirer
-    .prompt(employeePrompt)    
-    .then((answers) => {
-
-        const sql = `INSERT INTO employee (first_name) VALUES (?);`;
-        const params = [answers.addEmployeeFname, answers.addEmployeeLname, answers.addEmployeeRole, answers.addEmployeeManager];
-
-        return connection.promise().query(sql, params);
-    })
-
-    .then((result) => {
-        console.log('Success!');
-        init()
-    })
-    .catch((err) => {
+    connection.query('SELECT id, title FROM role', (err, roleResult) => {
+      if (err) {
         console.error(err);
-    });
-    
-};
+        return;
+      }
+  
+      const roles = roleResult.map(row => ({ id: row.id, title: row.title }));
+  
+      connection.query('SELECT id, last_name FROM employee', (err, employeeResult) => {
+        if (err) {
+          console.error(err);
+          return;
+        }
+  
+        const managers = employeeResult.map(row => ({ id: row.id, last_name: row.last_name }));
+  
+        console.log(roles, managers);
+  
+        inquirer
+          .prompt([
+            {
+              type: 'input',
+              name: 'fName',
+              message: "What is the new employee's first name?",
+            },
+            {
+              type: 'input',
+              name: 'lName',
+              message: "What is the new employee's last name?",
+            },
+            {
+              type: 'list',
+              name: 'role',
+              message: 'What is the role of the new employee?',
+              choices: roles.map(role => role.title),
+            },
+            {
+              type: 'list',
+              name: 'manager',
+              message: "Who is the new employee's manager?",
+              choices: managers.map(manager => manager.last_name),
+            },
+          ])
+          .then((answers) => {
+            const selectedRole = roles.find(role => role.title === answers.role);
+            const selectedManager = managers.find(manager => manager.last_name === answers.manager);
+            const sql = 'INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?);';
+            const params = [answers.fName, answers.lName, selectedRole.id, selectedManager.id];
+  
+            return connection.promise().query(sql, params);
+          })
 
-// remove employee: working but only displays last name.
+          .then((result) => {
+            console.log('Success!');
+            init();
+          })
+          .catch((err) => {
+            console.error(err);
+          });
+      });
+    });
+  };
+
+
+// remove employee: done. it works.
 function rmEmployee() {
     connection.query('SELECT * FROM employee;', (err, result) => {
         if (err) {console.error(err)}
@@ -264,25 +312,35 @@ function rmEmployee() {
     });
     };
 
-// update employee:
+
+// update employee: in progress...
 function updateEmployee() {
 
-    connection.query('SELECT name FROM department;', (err, result) => 
+    connection.query('SELECT last_name FROM employee; SELECT title FROM role;', (err, result) => 
         {
-            if (err) {console.error(err)};
+            if (err) {console.error(err)}
 
-            const deptNames = result.map(({id, name}) => ({name: name, value: id}));
+            const employees = result.map(({id, name}) => ({name: name, value: id}));
+            const roles = result[0]
 
-    inquirer.prompt(updatePrompt)
+    inquirer.prompt([
+        {
+            type: 'list',
+            name: 'employee',
+            message: 'Which employee do you want to update?',
+            choices: employess
+        },
+        {
+            type: 'list',
+            name: 'role',
+            message: 'What is the employee\'s new role?',
+            choices: roles
+        }
+    ])
     .then((answers) => 
-    {
-        console.log(answers)
+    {})
 
-
-        init();
-    });
-}
-    )};
+})};
 
 
 
