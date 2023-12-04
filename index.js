@@ -4,16 +4,13 @@ const mysql2 = require('mysql2');
 
 // require prompts
 const firstPrompt = require('./prompts/prompts');
-const departmentPrompt = require('./prompts/department');
-const rolePrompt = require('./prompts/role');
-const employeePrompt = require('./prompts/employee');
-const updatePrompt = require('./prompts/update');
+
 
 // require mysql2 connection:
 const connection = require('./mysql2');
 
 
-// view departments: DONE.
+// view departments: 
 function deptView(){
     connection.query('SELECT * FROM department;', (err, results) => {
         if (err) {
@@ -26,7 +23,7 @@ function deptView(){
         
     };
 
-// view roles: DONE.
+// view roles:  
 function roleView(){
     connection.query(`SELECT 
     role.id,
@@ -48,7 +45,7 @@ FROM
     
 };
 
-// view employees: DONE.
+// view employees:  
 function employeeView(){
     connection.query(`SELECT
     e.id AS employee_id,
@@ -76,7 +73,7 @@ FROM
 
 
 
-// add department: DONE.
+// add department:  
 function addDept() {
     inquirer.prompt([{
             type: 'input',
@@ -96,7 +93,7 @@ function addDept() {
         });
 };
 
-// remove department: DONE.
+// remove department:  
 function rmDept() {
     connection.query('SELECT * FROM department;', (err, result) => 
     {
@@ -132,7 +129,7 @@ function rmDept() {
 
 
 
-// add role:  done.
+// add role:   
 function addRole(){
 
     connection.query('SELECT * FROM department;', (err, result) => 
@@ -176,7 +173,7 @@ function addRole(){
     }) 
 };
 
-// remove role: done.
+// remove role:  
 function rmRole() {
     
     connection.query('SELECT * FROM role;', (err, result) => 
@@ -215,7 +212,7 @@ function rmRole() {
 
     
     
-// add employee: DONE.
+// add employee:  
 function addEmployee() {
     connection.query('SELECT id, title FROM role', (err, roleResult) => {
       if (err) {
@@ -233,7 +230,7 @@ function addEmployee() {
   
         const managers = employeeResult.map(row => ({ id: row.id, last_name: row.last_name }));
   
-        console.log(roles, managers);
+        // console.log(roles, managers);
   
         inquirer
           .prompt([
@@ -281,7 +278,7 @@ function addEmployee() {
   };
 
 
-// remove employee: done. it works.
+// remove employee: 
 function rmEmployee() {
     connection.query('SELECT * FROM employee;', (err, result) => {
         if (err) {console.error(err)}
@@ -313,36 +310,150 @@ function rmEmployee() {
     };
 
 
-// update employee: in progress...
+// update employee:  
 function updateEmployee() {
+    connection.query('SELECT id, last_name FROM employee', (err, employees) => {
+      if (err) {
+        console.error(err);
+        // Handle the error
+      } else {
+        connection.query('SELECT id, title FROM role', (err, roles) => {
+          if (err) {
+            console.error(err);
+            // Handle the error
+          } else {
+            const employeeChoices = employees.map(({ id, last_name }) => ({ name: last_name, value: id }));
+            const roleChoices = roles.map(({ id, title }) => ({ name: title, value: id }));
+  
+            inquirer.prompt([
+              {
+                type: 'list',
+                name: 'employee',
+                message: 'Which employee do you want to update? Select by last name...',
+                choices: employeeChoices,
+              },
+              {
+                type: 'list',
+                name: 'role',
+                message: 'What is the employee\'s new role?',
+                choices: roleChoices,
+              },
+            ])
+              .then((answers) => {
+                const employeeId = answers.employee;
+                const newRoleId = answers.role;
+  
+                const sql = 'UPDATE employee SET role_id = ? WHERE id = ?';
+                const values = [newRoleId, employeeId];
+  
+                connection.promise().query(sql, values)
+                  .then(() => {
+                    console.log('Employee role updated successfully');
+                    init();
+                })
+                  .catch((err) => {
+                    console.error(err);
+                    // Handle the error
+                  })
+                  
+              });
+          }
+        });
+      }
+    });
+  };
 
-    connection.query('SELECT last_name FROM employee; SELECT title FROM role;', (err, result) => 
-        {
-            if (err) {console.error(err)}
-
-            const employees = result.map(({id, name}) => ({name: name, value: id}));
-            const roles = result[0]
-
-    inquirer.prompt([
-        {
+ // update manager: 
+function mUpdate() {
+    connection.query('SELECT last_name FROM employee;', (err, employeeResults) => {
+      if (err) {
+        console.error(err);
+      } else {
+        connection.query('SELECT * FROM employee;', (err, managerResults) => {
+          if (err) {
+            console.error(err);
+            // Handle the error
+          } else {
+            const employees = employeeResults.map(({ last_name }) => ({ name: last_name }));
+            const managers = managerResults.map(({ manager_id }) => ({ name: manager_id }));
+  
+            inquirer
+              .prompt([
+                {
+                  type: 'list',
+                  name: 'employee',
+                  choices: employees,
+                  message: 'Which employee is being reassigned a new manager?'
+                },
+                {
+                  type: 'list',
+                  name: 'manager',
+                  choices: managers,
+                  message: 'Who is the new manager?'
+                }
+              ])
+              .then((answers) => {
+                const employee = answers.employee;
+                const manager = answers.manager;
+                const sql = 'UPDATE employee SET manager_id = ? WHERE last_name = ?';
+                const values = [manager, employee];
+  
+                connection.promise()
+                  .query(sql, values)
+                  .then(() => {
+                    console.log('Employee manager updated successfully');
+                    init();
+                  })
+                  .catch((err) => {
+                    console.error(err);
+                    // Handle the error
+                  });
+              });
+          }
+        });
+      }
+    });
+  };
+  
+// budget by department:
+function budgetView() {
+    connection.query('SELECT * FROM department;', (err, results) => {
+      if (err) {
+        console.error(err);
+      }
+      const departments = results.map(({ id, name }) => ({ name: name, value: id }));
+  
+      inquirer
+        .prompt([
+          {
+            name: 'department',
+            message: 'Which department would you like to view for total budget?',
+            choices: departments,
             type: 'list',
-            name: 'employee',
-            message: 'Which employee do you want to update?',
-            choices: employess
-        },
-        {
-            type: 'list',
-            name: 'role',
-            message: 'What is the employee\'s new role?',
-            choices: roles
-        }
-    ])
-    .then((answers) => 
-    {})
-
-})};
-
-
+          },
+        ])
+        .then((answers) => {
+          const sql = `
+            SELECT department.name AS department_name, SUM(role.salary) AS total_budget
+            FROM role
+            INNER JOIN department ON role.department_id = department.id
+            WHERE department.id = (?)
+            GROUP BY department.name;
+          `;
+          return connection
+            .promise()
+            .query(sql, [answers.department])
+            .then((result) => {
+              const refined = result[0];
+              console.table(refined);
+              init();
+            })
+            .catch((err) => {
+              console.error(err);
+            });
+        });
+    });
+  };
 
 
 
@@ -374,6 +485,10 @@ function init() {
             else if (answers.options === "Remove a department") {rmDept()}
 
             else if (answers.options === "Remove an employee") {rmEmployee()}
+
+            else if (answers.options === "Update a employee\'s manager") {mUpdate()}
+
+            else if (answers.options === "View budget by department") {budgetView()}
                 
             else 
                 connection.end()
@@ -382,4 +497,4 @@ function init() {
 };
 
 
-init()
+init();
