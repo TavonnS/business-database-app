@@ -375,7 +375,7 @@ function mUpdate() {
             // Handle the error
           } else {
             const employees = employeeResults.map(({ last_name }) => ({ name: last_name }));
-            const managers = managerResults.map(({ manager_id }) => ({ name: manager_id }));
+            const managers = managerResults.map(({ manager_id, last_name }) => ({ name: last_name, value: manager_id }));
   
             inquirer
               .prompt([
